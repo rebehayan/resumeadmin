@@ -3,6 +3,7 @@ import Layout from "./pages/Layout";
 import Main from "./pages/Main";
 import Login from "./pages/Login";
 import Join from "./pages/Join";
+import Style from "./pages/Style";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
   {
     path: "/join",
     element: <Join />,
+  },
+  {
+    path: "/styleguide",
+    element: <Style />,
   },
 ]);
 
