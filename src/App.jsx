@@ -4,14 +4,20 @@ import Main from "./pages/Main";
 import Login from "./pages/Login";
 import Join from "./pages/Join";
 import Style from "./pages/Style";
+import ProtectedRoute from "./route/ProtectedRoute";
+import NotFound from "./pages/NotFound";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />,
+    element: (
+      <ProtectedRoute>
+        <Layout />
+      </ProtectedRoute>
+    ),
     children: [
       {
-        path: "",
+        path: "/",
         element: <Main />,
       },
     ],
@@ -27,6 +33,10 @@ const router = createBrowserRouter([
   {
     path: "/styleguide",
     element: <Style />,
+  },
+  {
+    path: "*",
+    element: <NotFound />,
   },
 ]);
 

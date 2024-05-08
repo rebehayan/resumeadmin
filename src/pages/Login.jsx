@@ -1,48 +1,65 @@
 import _ from "lodash";
 import PassWord from "../components/form/Password";
-import File from "../components/form/File";
-import Checkbox from "../components/form/Checkbox";
 import Button from "../components/form/Button";
-import Textarea from "../components/form/Textarea";
-import Select from "../components/form/Select";
 import Input from "../components/form/Input";
-import { option } from "../lib/option";
+import { useState } from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
+import { Link, useNavigate } from "react-router-dom";
+import { FirebaseError } from "firebase/app";
 
 const Login = () => {
-  const handleInput = _.debounce((e) => {
-    console.log(e.target.value);
+  const [isId, setIsId] = useState("");
+  const [isPw, setIsPw] = useState("");
+  const [isError, setIsError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogin = _.debounce((e) => {
+    const { name, value } = e.target;
+    if (name === "id") {
+      setIsId(value);
+    } else if (name === "password") {
+      setIsPw(value);
+    }
   }, 500);
 
-  const handlePassword = _.debounce((e) => {
-    console.log(e.target.value);
-  }, 500);
-
-  const handleCheck = (e) => {
-    const isCheck = e.target.checked;
-    const isName = e.target.name;
-    isCheck && console.log(isName);
-  };
-
-  const handleSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    console.log("전송");
+    setIsLoading(true);
+    if (isId === "" || isPw === "") {
+      setIsError("아이디 / 비밀번호를 입력하세요.");
+    }
+    try {
+      await signInWithEmailAndPassword(auth, isId, isPw);
+      navigate("/");
+      setIsLoading(false);
+    } catch (error) {
+      if (error instanceof FirebaseError) {
+        if (error.message.match("auth/invalid-credential")) {
+          setIsError("아이디 또는 비번이 맞지 않습니다.");
+        } else {
+          console.log(error.message);
+        }
+      }
+    } finally {
+      console.log("끝");
+    }
   };
 
   return (
     <main className="p-10">
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={onSubmit}>
         <fieldset>
-          <legend>온라인서식 가이드</legend>
-          <Input name="id" onChange={handleInput} />
-          <PassWord name="password" onChange={handlePassword} />
-          <File />
-          <Checkbox value="선택하세요" name="hobby" onChange={handleCheck} />
-          <Checkbox value="선택하세요2" name="hobby2" onChange={handleCheck} />
-          <Button value="검색" />
-          <Textarea />
-          <Select options={option} value="선택하세요." />
+          <legend>로그인</legend>
+          <Input name="id" placeholder="아이디" onChange={handleLogin} />
+          <PassWord name="password" placeholder="비밀번호" onChange={handleLogin} />
+          <Button value="로그인" color="blue" />
         </fieldset>
       </form>
+      <Link to="/join">회원가입</Link>
+      {isError && isError}
+      {isLoading && "Loading..."}
     </main>
   );
 };
