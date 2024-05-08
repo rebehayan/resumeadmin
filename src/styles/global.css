@@ -120,3 +120,15 @@ input {
 .textarea {
   @apply bg-gray-100 text-gray-500 px-4 py-1 rounded-md border border-solid border-gray-200 appearance-none w-auto box-border;
 }
+.btn {
+  @apply inline-flex h-16 items-center px-5 rounded-full bg-black text-white justify-center text-lg;
+}
+
+.gnb {
+  a {
+    @apply rounded-full bg-white py-3 px-8 font-bold;
+    &.--active {
+      @apply bg-teal-700 text-white;
+    }
+  }
+}

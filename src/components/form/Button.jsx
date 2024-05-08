@@ -1,6 +1,6 @@
-const Button = ({ color, value }) => {
+const Button = ({ className, value }) => {
   return (
-    <button type="submit" className={color}>
+    <button type="submit" className={`btn ${className}`}>
       {value}
     </button>
   );

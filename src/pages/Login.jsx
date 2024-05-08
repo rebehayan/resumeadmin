@@ -48,16 +48,18 @@ const Login = () => {
   };
 
   return (
-    <main className="p-10">
+    <main className="flex h-[100vh] justify-center items-center flex-col">
       <form onSubmit={onSubmit}>
-        <fieldset>
-          <legend>로그인</legend>
+        <fieldset className="grid gap-3 w-[25rem]">
+          <legend className="text-center text-3xl pb-10">로그인</legend>
           <Input name="id" placeholder="아이디" onChange={handleLogin} />
           <PassWord name="password" placeholder="비밀번호" onChange={handleLogin} />
-          <Button value="로그인" color="blue" />
+          <Button value="로그인" className="w-full" />
         </fieldset>
       </form>
-      <Link to="/join">회원가입</Link>
+      <Link to="/join" className="mt-10">
+        회원가입
+      </Link>
       {isError && isError}
       {isLoading && "Loading..."}
     </main>
