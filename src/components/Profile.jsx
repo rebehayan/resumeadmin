@@ -4,6 +4,9 @@ import { auth } from "../firebase";
 const Profile = () => {
   const navigate = useNavigate();
   const user = auth.currentUser;
+  if (!user) {
+    navigate("/login");
+  }
   const handleLogOut = async () => {
     try {
       await auth.signOut();

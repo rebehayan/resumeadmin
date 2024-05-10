@@ -1,18 +1,21 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const Gnb = () => {
+  const location = useLocation();
   return (
     <>
       <h2 className="sr-only">대메뉴</h2>
       <nav className=" justify-self-center">
         <ul className="gnb inline-flex  gap-1 py-5 px-3 rounded-full border-slate-200 border-[1px]">
           <li>
-            <Link to="/" className="--active">
+            <Link to="/" className={location.pathname === "/" ? "--active" : ""}>
               홈
             </Link>
           </li>
           <li>
-            <Link to="/resume">이력서</Link>
+            <Link to="/resume" className={location.pathname === "/resume" ? "--active" : ""}>
+              이력서
+            </Link>
           </li>
           <li>
             <Link to="/education">교육이력</Link>

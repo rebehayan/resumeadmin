@@ -6,6 +6,7 @@ import Join from "./pages/Join";
 import Style from "./pages/Style";
 import ProtectedRoute from "./route/ProtectedRoute";
 import NotFound from "./pages/NotFound";
+import Resume from "./pages/Resume";
 
 const router = createBrowserRouter([
   {
@@ -20,6 +21,14 @@ const router = createBrowserRouter([
         path: "/",
         element: <Main />,
       },
+      {
+        path: "/styleguide",
+        element: <Style />,
+      },
+      {
+        path: "/resume",
+        element: <Resume />,
+      },
     ],
   },
   {
@@ -29,10 +38,6 @@ const router = createBrowserRouter([
   {
     path: "/join",
     element: <Join />,
-  },
-  {
-    path: "/styleguide",
-    element: <Style />,
   },
   {
     path: "*",

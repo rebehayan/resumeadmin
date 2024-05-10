@@ -7,12 +7,14 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { Link, useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
+import Alert from "../components/Alert";
 
 const Login = () => {
   const [isId, setIsId] = useState("");
   const [isPw, setIsPw] = useState("");
   const [isError, setIsError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isAlert, setIsAlert] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = _.debounce((e) => {
@@ -29,21 +31,27 @@ const Login = () => {
     setIsLoading(true);
     if (isId === "" || isPw === "") {
       setIsError("아이디 / 비밀번호를 입력하세요.");
+      setIsAlert(!isAlert);
     }
     try {
       await signInWithEmailAndPassword(auth, isId, isPw);
       navigate("/");
-      setIsLoading(false);
     } catch (error) {
       if (error instanceof FirebaseError) {
         if (error.message.match("auth/invalid-credential")) {
           setIsError("아이디 또는 비번이 맞지 않습니다.");
+          setIsAlert(!isAlert);
+        } else if (error.message.match("many")) {
+          setIsError(
+            "여러 번의 로그인 시도 실패로 인해 이 계정에 대한 액세스가 일시적으로 비활성화되었습니다. 비밀번호를 재설정하여 즉시 복원하거나 나중에 다시 시도할 수 있습니다. (인증/요청이 너무 많음)."
+          );
+          setIsAlert(!isAlert);
         } else {
           console.log(error.message);
         }
       }
     } finally {
-      console.log("끝");
+      setIsLoading(false);
     }
   };
 
@@ -60,7 +68,9 @@ const Login = () => {
       <Link to="/join" className="mt-10">
         회원가입
       </Link>
-      {isError && isError}
+      <Alert open={isAlert} close={() => setIsAlert(false)}>
+        {isError && isError}
+      </Alert>
       {isLoading && "Loading..."}
     </main>
   );
