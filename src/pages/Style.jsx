@@ -8,8 +8,13 @@ import Select from "../components/form/Select";
 import Input from "../components/form/Input";
 import { option } from "../lib/option";
 import Radio from "../components/form/Radio";
+import Dialog from "../components/Dialog";
+import Alert from "../components/Alert";
+import { useState } from "react";
 
 const Login = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
   const handleInput = _.debounce((e) => {
     console.log(e.target.value);
   }, 500);
@@ -33,6 +38,9 @@ const Login = () => {
     const checked = e.target.checked;
     checked && console.log(e.target.value);
   };
+  const handleAlert = () => {
+    setIsOpen(!isOpen);
+  };
 
   return (
     <main className="p-10">
@@ -51,6 +59,15 @@ const Login = () => {
           <Radio name="radiogroup" label="선택2" value="선택2" onChange={handleRadio} />
         </fieldset>
       </form>
+      <br />
+      <br />
+      <br />
+      <button onClick={handleAlert}>경고창열기</button>
+
+      <Dialog></Dialog>
+      <Alert open={isOpen} close={() => setIsOpen(false)}>
+        안녕하세요.
+      </Alert>
     </main>
   );
 };
