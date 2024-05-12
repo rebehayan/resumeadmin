@@ -7,6 +7,7 @@ import Style from "./pages/Style";
 import ProtectedRoute from "./route/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 import Resume from "./pages/Resume";
+import Mypage from "./pages/Mypage";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
       {
         path: "/resume",
         element: <Resume />,
+      },
+      {
+        path: "/mypage",
+        element: <Mypage />,
       },
     ],
   },
