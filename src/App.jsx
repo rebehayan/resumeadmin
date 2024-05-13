@@ -6,6 +6,7 @@ import Join from "./pages/Join";
 import Style from "./pages/Style";
 import ProtectedRoute from "./route/ProtectedRoute";
 import NotFound from "./pages/NotFound";
+import Project from "./pages/Project";
 import Resume from "./pages/Resume";
 import Mypage from "./pages/Mypage";
 
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
       {
         path: "/resume",
         element: <Resume />,
+      },
+      {
+        path: "/project",
+        element: <Project />,
       },
       {
         path: "/mypage",
