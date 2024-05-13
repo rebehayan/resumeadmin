@@ -13,8 +13,8 @@ const Gnb = () => {
             </Link>
           </li>
           <li>
-            <Link to="/resume" className={location.pathname === "/resume" ? "--active" : ""}>
-              이력서
+            <Link to="/project" className={location.pathname === "/project" ? "--active" : ""}>
+              프로젝트
             </Link>
           </li>
           <li>

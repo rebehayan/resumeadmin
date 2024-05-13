@@ -7,7 +7,9 @@ const Profile = () => {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState({});
   const user = auth.currentUser;
-
+  if (!user) {
+    navigate("/login");
+  }
   const fetchData = async () => {
     const userDocRef = doc(db, "users", user.uid);
     const userDoc = await getDoc(userDocRef);
@@ -18,11 +20,8 @@ const Profile = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [user]);
 
-  if (!user) {
-    navigate("/login");
-  }
   const handleLogOut = async () => {
     try {
       await auth.signOut();
