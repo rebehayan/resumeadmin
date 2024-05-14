@@ -1,4 +1,5 @@
 const AddAvatar = ({ value, onChange, src }) => {
+  console.log(src);
   return (
     <>
       <label htmlFor="avatar" className="block border-slate-300 border-[1px] w-full aspect-square bg-white cursor-pointer">

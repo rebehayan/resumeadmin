@@ -1,25 +1,19 @@
 import { Link, useNavigate } from "react-router-dom";
-import { auth, db } from "../firebase";
-import { doc, getDoc } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { auth } from "../firebase";
+import { useEffect } from "react";
+import { useUserStore } from "../store/userStore";
+import { IoMdPower } from "react-icons/io";
 
 const Profile = () => {
   const navigate = useNavigate();
-  const [userInfo, setUserInfo] = useState({});
+  const { userData, setUserData } = useUserStore();
   const user = auth.currentUser;
   if (!user) {
     navigate("/login");
   }
-  const fetchData = async () => {
-    const userDocRef = doc(db, "users", user.uid);
-    const userDoc = await getDoc(userDocRef);
-    setUserInfo({
-      name: userDoc.data()?.name,
-    });
-  };
 
   useEffect(() => {
-    fetchData();
+    setUserData(user);
   }, [user]);
 
   const handleLogOut = async () => {
@@ -31,12 +25,14 @@ const Profile = () => {
     }
   };
   return (
-    <div>
-      <Link to="/mypage">{user?.displayName || userInfo.name}님. 반갑습니다.</Link>
-      <button>
-        <img src={user?.avatar} alt="개인정보수정" />
+    <div className="flex items-center gap-2 justify-self-end">
+      <Link to="/mypage">{userData.name}</Link>
+      <Link to="/mypage">
+        <img src={userData?.avatar} alt="개인정보수정" className="w-10 aspect-square rounded-full border-solid border-[1px] border-slate-300" />
+      </Link>
+      <button onClick={handleLogOut} aria-label="로그아웃" className="w-10 aspect-square rounded-full border-solid border-[1px] border-slate-300 flex items-center justify-center">
+        <IoMdPower />
       </button>
-      <button onClick={handleLogOut}>로그아웃</button>
     </div>
   );
 };

@@ -1,36 +1,46 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Input from "../components/form/Input";
 import Checkbox from "../components/form/Checkbox";
 import AddAvatar from "../components/AddAvatar";
-import { auth, db, storage } from "../firebase";
+import { db, storage } from "../firebase";
 import _ from "lodash";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import Block from "../components/Block";
 import Heading from "../components/Heading";
 import Text from "../components/Text";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import Loading from "../components/Loading";
+import { useUserStore } from "../store/userStore";
 
 const Mypage = () => {
-  const user = auth.currentUser;
-  const userDocRef = doc(db, "users", user.uid);
+  const [isLoading, setIsLoading] = useState(false);
+  const { userData } = useUserStore();
+  const [userInfo, setUserInfo] = useState(userData);
+  const userDocRef = doc(db, "users", userData.uid);
+  console.log(userInfo);
 
-  const [userInfo, setUserInfo] = useState({});
+  // const onChange = _.debounce((e) => {
+  //   const { name, value, checked } = e.target;
 
-  const fetchData = async () => {
-    try {
-      const userDoc = await getDoc(userDocRef);
-      const userData = userDoc.data();
-      setUserInfo({
-        ...userData,
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  //   let newValue;
+  //   let newUrlValue = "";
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  //   // name, phone, job, address와 같은 고정된 필드 처리
+  //   if (name === "name" || name === "phone" || name === "job" || name === "address") {
+  //     newValue = value;
+  //   }
+  //   // SNS 관련 필드 처리
+  //   else if (name === "instagram" || name === "facebook" || name === "blog" || name === "youtube" || name === "tiktok" || name === "twitter" || name === "website") {
+  //     newValue = checked;
+  //     newUrlValue = checked ? value : "";
+  //   }
+
+  //   setUserInfo((prev) => ({
+  //     ...prev,
+  //     [name]: newValue,
+  //     [`${name}_url`]: newUrlValue,
+  //   }));
+  // }, 300);
 
   const onChange = _.debounce((e) => {
     const { name, value, checked } = e.target;
@@ -71,7 +81,7 @@ const Mypage = () => {
     } else if (name === "website_url") {
       setUserInfo((prev) => ({ ...prev, website_url: value }));
     }
-  }, 300);
+  }, 100);
 
   const handleAddFile = (e) => {
     const file = e.target.files[0];
@@ -82,7 +92,7 @@ const Mypage = () => {
     e.preventDefault();
     const filename = userInfo.avatar.name;
     const userStorage = ref(storage, `userAvatar/${filename}`);
-
+    setIsLoading(true);
     try {
       const result = await uploadBytes(userStorage, userInfo.avatar);
       const downloadURL = await getDownloadURL(result.ref);
@@ -96,11 +106,12 @@ const Mypage = () => {
         { merge: true }
       );
       setUserInfo((prev) => ({ ...prev, avatar: downloadURL }));
+
+      setIsLoading(false);
     } catch (error) {
       console.log(error);
     }
   };
-  console.log(userInfo);
 
   return (
     <div className="flex gap-10">
@@ -115,10 +126,10 @@ const Mypage = () => {
               <legend className="sr-only">개인정보 수정</legend>
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Input title="이름" name="name" value={user?.displayName || userInfo.name} onChange={onChange} />
+                  <Input title="이름" name="name" value={userInfo.name} onChange={onChange} />
                 </div>
                 <div className="grid gap-2">
-                  <Input title="이메일" name="email" value={user?.email} readOnly={true} />
+                  <Input title="이메일" name="email" value={userInfo?.email} readOnly={true} />
                 </div>
                 <div className="grid gap-2">
                   <Input title="핸드폰번호(-제외하고 입력)" type="number" name="phone" onChange={onChange} value={userInfo?.phone} />
@@ -133,7 +144,7 @@ const Mypage = () => {
                   <Text>SNS</Text>
                   <ul className="grid grid-cols-2 gap-4">
                     <li className="grid grid-cols-[10rem_1fr] items-center gap-2">
-                      <Checkbox label="인스타그램" name="instagram" onChange={onChange} checked={userInfo.instagram || false} />
+                      <Checkbox label="인스타그램" name="instagram" onChange={onChange} checked={userInfo.instagram} />
                       {userInfo.instagram && <Input type="url" name="instagram_url" value={userInfo.instagram_url} placeholder="주소를 입력해 주세요." onChange={onChange} />}
                     </li>
                     <li className="grid grid-cols-[10rem_1fr] items-center gap-2">
@@ -170,6 +181,7 @@ const Mypage = () => {
               </div>
             </fieldset>
           </form>
+          {isLoading && <Loading />}
         </Block>
       </div>
     </div>
