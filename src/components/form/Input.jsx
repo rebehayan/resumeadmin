@@ -1,4 +1,5 @@
 import { useId } from "react";
+import Text from "../Text";
 
 const Input = ({ type = "text", title, name, placeholder, value, onChange, readOnly, disabled }) => {
   const id = useId();
@@ -6,7 +7,7 @@ const Input = ({ type = "text", title, name, placeholder, value, onChange, readO
     <>
       {title && (
         <label htmlFor={`input-${id}`} className="whitespace-nowrap">
-          {title}
+          <Text>{title}</Text>
         </label>
       )}
       <input

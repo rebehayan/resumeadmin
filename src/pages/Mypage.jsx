@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import Input from "../components/form/Input";
 import Checkbox from "../components/form/Checkbox";
-import Avatar from "../components/Avatar";
-import { auth, db } from "../firebase";
+import AddAvatar from "../components/AddAvatar";
+import { auth, db, storage } from "../firebase";
 import _ from "lodash";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import Block from "../components/Block";
 import Heading from "../components/Heading";
+import Text from "../components/Text";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 const Mypage = () => {
   const user = auth.currentUser;
@@ -33,61 +35,77 @@ const Mypage = () => {
   const onChange = _.debounce((e) => {
     const { name, value, checked } = e.target;
     if (name === "name") {
-      setUserInfo({ ...userInfo, name: value });
+      setUserInfo((prev) => ({ ...prev, name: value }));
     } else if (name === "phone") {
-      setUserInfo({ ...userInfo, phone: value });
+      setUserInfo((prev) => ({ ...prev, phone: value }));
     } else if (name === "job") {
-      setUserInfo({ ...userInfo, job: value });
+      setUserInfo((prev) => ({ ...prev, job: value }));
     } else if (name === "address") {
-      setUserInfo({ ...userInfo, address: value });
+      setUserInfo((prev) => ({ ...prev, address: value }));
     } else if (name === "instagram") {
-      setUserInfo({ ...userInfo, instagram: checked });
+      setUserInfo((prev) => ({ ...prev, instagram: checked }));
     } else if (name === "instagram_url") {
-      setUserInfo({ ...userInfo, instagram_url: value });
+      setUserInfo((prev) => ({ ...prev, instagram_url: value }));
     } else if (name === "facebook") {
-      setUserInfo({ ...userInfo, facebook: checked });
+      setUserInfo((prev) => ({ ...prev, facebook: checked }));
     } else if (name === "facebook_url") {
-      setUserInfo({ ...userInfo, facebook_url: value });
+      setUserInfo((prev) => ({ ...prev, facebook_url: value }));
     } else if (name === "blog") {
-      setUserInfo({ ...userInfo, blog: checked });
+      setUserInfo((prev) => ({ ...prev, blog: checked }));
     } else if (name === "blog_url") {
-      setUserInfo({ ...userInfo, blog_url: value });
+      setUserInfo((prev) => ({ ...prev, blog_url: value }));
     } else if (name === "youtube") {
-      setUserInfo({ ...userInfo, youtube: checked });
+      setUserInfo((prev) => ({ ...prev, youtube: checked }));
     } else if (name === "youtube_url") {
-      setUserInfo({ ...userInfo, youtube_url: value });
+      setUserInfo((prev) => ({ ...prev, youtube_url: value }));
     } else if (name === "tiktok") {
-      setUserInfo({ ...userInfo, tiktok: checked });
+      setUserInfo((prev) => ({ ...prev, tiktok: checked }));
     } else if (name === "tiktok_url") {
-      setUserInfo({ ...userInfo, tiktok_url: value });
+      setUserInfo((prev) => ({ ...prev, tiktok_url: value }));
     } else if (name === "twitter") {
-      setUserInfo({ ...userInfo, twitter: checked });
+      setUserInfo((prev) => ({ ...prev, twitter: checked }));
     } else if (name === "twitter_url") {
-      setUserInfo({ ...userInfo, twitter_url: value });
+      setUserInfo((prev) => ({ ...prev, twitter_url: value }));
     } else if (name === "website") {
-      setUserInfo({ ...userInfo, website: checked });
+      setUserInfo((prev) => ({ ...prev, website: checked }));
     } else if (name === "website_url") {
-      setUserInfo({ ...userInfo, website_url: value });
+      setUserInfo((prev) => ({ ...prev, website_url: value }));
     }
   }, 300);
 
+  const handleAddFile = (e) => {
+    const file = e.target.files[0];
+    setUserInfo((prev) => ({ ...prev, avatar: file }));
+  };
+
   const onSubmit = async (e) => {
     e.preventDefault();
+    const filename = userInfo.avatar.name;
+    const userStorage = ref(storage, `userAvatar/${filename}`);
+
     try {
-      await setDoc(userDocRef, {
-        ...userInfo,
-        uid: user?.uid,
-      });
-      console.log("성공");
+      const result = await uploadBytes(userStorage, userInfo.avatar);
+      const downloadURL = await getDownloadURL(result.ref);
+
+      await setDoc(
+        userDocRef,
+        {
+          ...userInfo,
+          avatar: downloadURL,
+        },
+        { merge: true }
+      );
+      setUserInfo((prev) => ({ ...prev, avatar: downloadURL }));
     } catch (error) {
       console.log(error);
     }
   };
+  console.log(userInfo);
 
   return (
     <div className="flex gap-10">
       <div className="w-[200px]">
-        <Avatar />
+        <AddAvatar onChange={handleAddFile} src={userInfo?.avatar} />
       </div>
       <div className="flex-1">
         <Heading tag="h2" text="개인정보 수정" />
@@ -96,26 +114,26 @@ const Mypage = () => {
             <fieldset>
               <legend className="sr-only">개인정보 수정</legend>
               <div className="grid grid-cols-2 gap-4">
-                <div>
+                <div className="grid gap-2">
                   <Input title="이름" name="name" value={user?.displayName || userInfo.name} onChange={onChange} />
                 </div>
-                <div>
+                <div className="grid gap-2">
                   <Input title="이메일" name="email" value={user?.email} readOnly={true} />
                 </div>
-                <div>
+                <div className="grid gap-2">
                   <Input title="핸드폰번호(-제외하고 입력)" type="number" name="phone" onChange={onChange} value={userInfo?.phone} />
                 </div>
-                <div>
+                <div className="grid gap-2">
                   <Input title="직업" type="text" name="job" onChange={onChange} value={userInfo?.job} />
                 </div>
                 <div className="col-span-2">
                   <Input title="주소" type="text" name="address" onChange={onChange} value={userInfo?.address} />
                 </div>
-                <div className="col-span-2">
-                  SNS
+                <div className="col-span-2 grid gap-2">
+                  <Text>SNS</Text>
                   <ul className="grid grid-cols-2 gap-4">
                     <li className="grid grid-cols-[10rem_1fr] items-center gap-2">
-                      <Checkbox label="인스타그램" name="instagram" onChange={onChange} checked={userInfo.instagram} />
+                      <Checkbox label="인스타그램" name="instagram" onChange={onChange} checked={userInfo.instagram || false} />
                       {userInfo.instagram && <Input type="url" name="instagram_url" value={userInfo.instagram_url} placeholder="주소를 입력해 주세요." onChange={onChange} />}
                     </li>
                     <li className="grid grid-cols-[10rem_1fr] items-center gap-2">
@@ -145,8 +163,10 @@ const Mypage = () => {
                   </ul>
                 </div>
               </div>
-              <div className="mt-10 text-center">
-                <button type="submit">회원정보수정</button>
+              <div className="mt-10 text-center border-t-[1px] border-slate-200 pt-10">
+                <button type="submit" className="btn-blue ">
+                  회원정보수정
+                </button>
               </div>
             </fieldset>
           </form>

@@ -34,7 +34,7 @@ const Profile = () => {
     <div>
       <Link to="/mypage">{user?.displayName || userInfo.name}님. 반갑습니다.</Link>
       <button>
-        <img src={user?.photoURL} alt="개인정보수정" />
+        <img src={user?.avatar} alt="개인정보수정" />
       </button>
       <button onClick={handleLogOut}>로그아웃</button>
     </div>
