@@ -118,8 +118,44 @@
 }
 
 .textarea {
-  @apply bg-gray-100 text-gray-500 px-4 py-1 rounded-md border border-solid border-gray-200 appearance-none w-auto box-border;
+  @apply bg-white text-gray-500 px-4 py-1 rounded-md border border-solid border-gray-200 appearance-none w-full box-border;
 }
+
+[type="date"] {
+  --date: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%239795a1" viewBox="0 0 16 16"><path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M2 2a1 1 0 0 0-1 1v1h14V3a1 1 0 0 0-1-1zm13 3H1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1z"/></svg>');
+  @apply pr-6 pl-4 h-10 box-border;
+
+  position: relative;
+  background-image: var(--date);
+  background-repeat: no-repeat;
+  background-position: right 0.875rem center;
+  background-color: white;
+  &::-webkit-clear-button,
+  &::-webkit-inner-spin-button {
+    display: none;
+  }
+  &::-webkit-calendar-picker-indicator {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: transparent;
+    color: transparent;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+  &::before {
+    content: attr(data-placeholder);
+    width: 100%;
+  }
+  &:valid::before {
+    display: none;
+  }
+  .reservation-write & {
+    @apply bg-white;
+  }
+}
+
 .btn {
   @apply inline-flex h-16 items-center px-5 rounded-full bg-black text-white justify-center text-lg;
 }

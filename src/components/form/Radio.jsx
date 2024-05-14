@@ -1,10 +1,10 @@
 import { useId } from "react";
 
-const Radio = ({ label, name, onChange, value }) => {
+const Radio = ({ label, name, onChange, checked = false, value }) => {
   const id = useId();
   return (
     <>
-      <input type="radio" name={name} value={value} id={`radio_${id}`} onChange={onChange} className="radio" />
+      <input type="radio" name={name} checked={checked} value={value} id={`radio_${id}`} onChange={onChange} className="radio blue" />
       <label htmlFor={`radio_${id}`}>{label}</label>
     </>
   );

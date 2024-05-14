@@ -13,7 +13,7 @@ const ProjectList = () => {
   };
   useEffect(() => {
     fetchData();
-  }, [projectCollectionRef]);
+  }, []);
 
   return (
     <ul>
