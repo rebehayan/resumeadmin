@@ -143,7 +143,7 @@ const ProjectCreate = () => {
               <div>
                 <ul className="flex gap-4">
                   <li>
-                    <Radio label="URL없음" name="url_group" checked={true} value="URL없음" onChange={onChange} />
+                    <Radio label="URL없음" name="url_group" value="URL없음" onChange={onChange} />
                   </li>
                   <li>
                     <Radio label="URL입력" name="url_group" value="URL입력" onChange={onChange} />

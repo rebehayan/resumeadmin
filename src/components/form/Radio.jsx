@@ -1,6 +1,6 @@
 import { useId } from "react";
 
-const Radio = ({ label, name, onChange, checked = false, value }) => {
+const Radio = ({ label, name, onChange, checked, value }) => {
   const id = useId();
   return (
     <>
