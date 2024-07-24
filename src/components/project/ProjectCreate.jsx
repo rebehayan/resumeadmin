@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Calendar from "../form/Calendar";
 import Input from "../form/Input";
 import Textarea from "../form/Textarea";
@@ -7,18 +7,12 @@ import Radio from "../form/Radio";
 import { auth, db } from "../../firebase";
 import { addDoc, collection } from "firebase/firestore";
 import TextError from "../TextError";
+import { useProjectIdStore } from "../../store/projectIdStore";
 
 const ProjectCreate = () => {
-  const [projectInfo, setProjectInfo] = useState({
-    title: "",
-    date_start: "",
-    date_end: "",
-    role: "",
-    content: "",
-    participation: "",
-    url: "",
-    url_group: "",
-  });
+  const [projectInfo, setProjectInfo] = useState({});
+  const { projectData, setProjectData } = useProjectIdStore();
+  const [isContent, setIsContent] = useState(false);
   const [isURL, setIsURL] = useState(false);
   const [isError, setIsError] = useState({
     title: false,
@@ -27,8 +21,19 @@ const ProjectCreate = () => {
     role: false,
     participation: false,
   });
-
   const user = auth.currentUser;
+
+  useEffect(() => {
+    if (projectData) {
+      setProjectInfo(projectData);
+      setIsContent(true);
+      if (projectData.url_group === "URL입력") {
+        setIsURL(true);
+      } else {
+        setIsURL(false);
+      }
+    }
+  }, [projectData]);
 
   const onChange = _.debounce((e) => {
     const { name, value } = e.target;
@@ -40,34 +45,43 @@ const ProjectCreate = () => {
     } else {
       setIsError((prev) => ({ ...prev, [name]: false }));
     }
-
-    if (name === "title") {
-      setProjectInfo((prev) => ({ ...prev, title: value }));
-    } else if (name === "date_start") {
-      setProjectInfo((prev) => ({ ...prev, date_start: value }));
-    } else if (name === "date_end") {
-      setProjectInfo((prev) => ({ ...prev, date_end: value }));
-    } else if (name === "role") {
-      setProjectInfo((prev) => ({ ...prev, role: value }));
-    } else if (name === "content") {
-      setProjectInfo((prev) => ({ ...prev, content: value }));
-    } else if (name === "participation") {
-      setProjectInfo((prev) => ({ ...prev, participation: value }));
-    } else if (name === "url") {
-      setProjectInfo((prev) => ({ ...prev, url: value }));
-    } else if (name === "url_group") {
+    if (name === "url_group") {
       setProjectInfo((prev) => ({ ...prev, url_group: value }));
-      if (value === "URL없음") {
-        setProjectInfo((prev) => ({ ...prev, url_group: "-" }));
-      }
       if (value === "URL입력") {
         setIsURL(true);
       } else {
         setIsURL(false);
+        setProjectInfo((prev) => ({ ...prev, url: "" }));
       }
     }
-  }, 300);
 
+    // if (name === "title") {
+    //   setProjectInfo((prev) => ({ ...prev, title: value }));
+    // } else if (name === "date_start") {
+    //   setProjectInfo((prev) => ({ ...prev, date_start: value }));
+    // } else if (name === "date_end") {
+    //   setProjectInfo((prev) => ({ ...prev, date_end: value }));
+    // } else if (name === "role") {
+    //   setProjectInfo((prev) => ({ ...prev, role: value }));
+    // } else if (name === "content") {
+    //   setProjectInfo((prev) => ({ ...prev, content: value }));
+    // } else if (name === "participation") {
+    //   setProjectInfo((prev) => ({ ...prev, participation: value }));
+    // } else if (name === "url") {
+    //   setProjectInfo((prev) => ({ ...prev, url: value }));
+    // } else if (name === "url_group") {
+    //   setProjectInfo((prev) => ({ ...prev, url_group: value }));
+    //   if (value === "URL없음") {
+    //     setProjectInfo((prev) => ({ ...prev, url_group: "-" }));
+    //   }
+    //   if (value === "URL입력") {
+    //     setIsURL(true);
+    //   } else {
+    //     setIsURL(false);
+    //   }
+    // }
+  }, 300);
+  console.log(projectInfo);
   const onSubmit = async (e) => {
     e.preventDefault();
     // 필수 입력값 확인
@@ -97,13 +111,62 @@ const ProjectCreate = () => {
         url: "",
         url_group: "",
       });
+      setProjectData(null);
     } catch (error) {
       console.log(error);
     }
   };
+  const onModify = async (e) => {
+    e.preventDefault();
+    // 필수 입력값 확인
+    const { title, role, date_start, date_end, participation } = projectInfo;
+    if (!title.trim() || !role.trim() || !date_start.trim() || !date_end.trim() || !participation.trim()) {
+      setIsError({
+        title: !title.trim(),
+        role: !role.trim(),
+        date_start: !date_start.trim(),
+        date_end: !date_end.trim(),
+        participation: !participation.trim(),
+      });
+      return;
+    }
+    try {
+      await addDoc(collection(db, "project"), {
+        ...projectInfo,
+        uid: user.uid,
+      });
+      setProjectInfo({
+        title: "",
+        date_start: "",
+        date_end: "",
+        role: "",
+        content: "",
+        participation: "",
+        url: "",
+        url_group: "",
+      });
+      setProjectData(null);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const onCancel = async (e) => {
+    e.preventDefault();
+    setProjectInfo({
+      title: "",
+      date_start: "",
+      date_end: "",
+      role: "",
+      content: "",
+      participation: "",
+      url: "",
+      url_group: "",
+    });
+    setProjectData(null);
+  };
   return (
     <>
-      <form onSubmit={onSubmit}>
+      <form>
         <fieldset>
           <legend className="sr-only">프로젝트 등록</legend>
           <div className="grid grid-cols-2 gap-4">
@@ -163,10 +226,21 @@ const ProjectCreate = () => {
               </div>
             </div>
           </div>
-          <div className="mt-10 text-center border-t-[1px] border-slate-200 pt-10">
-            <button type="submit" className="btn-blue">
-              등록
-            </button>
+          <div className="flex gap-2 justify-center mt-10 text-center border-t-[1px] border-slate-200 pt-10">
+            {isContent ? (
+              <>
+                <button type="submit" className="btn-blue" onSubmit={onModify}>
+                  프로젝트 수정
+                </button>
+                <button type="button" className="btn-gray" onClick={onCancel}>
+                  수정취소
+                </button>
+              </>
+            ) : (
+              <button type="submit" className="btn-blue" onSubmit={onSubmit}>
+                프로젝트 등록
+              </button>
+            )}
           </div>
         </fieldset>
       </form>

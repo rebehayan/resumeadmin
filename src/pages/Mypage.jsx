@@ -17,7 +17,6 @@ const Mypage = () => {
   const { userData } = useUserStore();
   const [userInfo, setUserInfo] = useState(userData);
   const userDocRef = doc(db, "users", userData.uid);
-  console.log(userInfo);
 
   // const onChange = _.debounce((e) => {
   //   const { name, value, checked } = e.target;

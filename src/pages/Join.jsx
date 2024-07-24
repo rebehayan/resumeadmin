@@ -64,9 +64,9 @@ const Join = () => {
     }
   };
   return (
-    <div>
+    <div className="flex items-center justify-center h-screen flex-col">
       <form onSubmit={onSubmit}>
-        <fieldset>
+        <fieldset className="grid gap-2 w-96">
           <legend>회원가입</legend>
           <Input name="name" onChange={onChange} placeholder="이름을 입력하세요." />
           <Input name="email" onChange={onChange} placeholder="이메일을 입력하세요." />
@@ -78,6 +78,7 @@ const Join = () => {
         </fieldset>
       </form>
       {isLoading && "loading..."}
+      <Link to="/">Cancel</Link>
       <Link to="/login">Login</Link>
     </div>
   );

@@ -6,7 +6,7 @@ import { doc, getDoc } from "firebase/firestore";
 let userStore = (set) => ({
   userData: {},
   setUserData: async (user) => {
-    const userDocRef = doc(db, "users", user.uid);
+    const userDocRef = doc(db, "users", user?.uid);
     const userDoc = await getDoc(userDocRef);
     set({ userData: userDoc.data() });
   },

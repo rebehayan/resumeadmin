@@ -14,7 +14,7 @@ const Profile = () => {
 
   useEffect(() => {
     setUserData(user);
-  }, [user]);
+  }, []);
 
   const handleLogOut = async () => {
     try {
